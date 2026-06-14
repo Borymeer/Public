@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>TMB · Franjo &amp; Jíťa</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--sky:#1B3A5C;--sbot:env(safe-area-inset-bottom,0px);--stop:env(safe-area-inset-top,0px)}
+body{font-family:system-ui,-apple-system,sans-serif;background:#F7F8FA;color:#111;-webkit-font-smoothing:antialiased;overflow-x:hidden;padding-bottom:calc(56px + var(--sbot))}
+/* TOP */
+.top{position:sticky;top:0;z-index:99;background:var(--sky);padding:calc(var(--stop) + .65rem) .875rem .55rem;color:#fff}
+.top h1{font-size:.95rem;font-weight:700}.top p{font-size:.68rem;opacity:.6;margin-top:1px}
+.top-acc{height:2px;background:linear-gradient(90deg,#5DBDB0,#8B74E8,#F5A623,#E06FAC);margin-top:.5rem}
+/* BOTTOM NAV */
+.bot{position:fixed;bottom:0;left:0;right:0;z-index:99;background:#fff;border-top:1px solid #E5E7EB;display:flex;padding-bottom:var(--sbot)}
+.bn{flex:1;background:transparent;border:none;font:500 .62rem system-ui;color:#6B7280;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.45rem .2rem .4rem;gap:2px;cursor:pointer;min-height:50px}
+.bn.on{color:var(--sky)}
+.bn svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+/* SCREENS — only .on is visible */
+.scr{display:none;padding:.75rem .75rem 1rem}
+.scr.on{display:block}
+/* PROGRESS */
+.prg{background:#fff;border:1px solid #E5E7EB;border-radius:8px;padding:.6rem .75rem;margin-bottom:.75rem}
+.prg-r{display:flex;justify-content:space-between;font-size:.72rem;color:#6B7280;margin-bottom:.3rem}
+.prg-t{height:6px;background:#E5E7EB;border-radius:99px;overflow:hidden}
+.prg-f{height:100%;background:linear-gradient(90deg,#5DBDB0,#8B74E8);transition:width .3s;border-radius:99px}
+/* PERSON TOGGLE */
+.ptog{display:flex;background:#fff;border:1px solid #E5E7EB;border-radius:8px;overflow:hidden;margin-bottom:.75rem}
+.pb{flex:1;background:transparent;border:none;font:500 .83rem system-ui;color:#6B7280;padding:.6rem;cursor:pointer;min-height:44px}
+.pb.on{background:var(--sky);color:#fff}
+/* SHARED */
+.sh{background:#fff;border:1px solid #E5E7EB;border-radius:8px;overflow:hidden;margin-bottom:.75rem}
+.sh-t{padding:.45rem .75rem;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sky);border-bottom:1px solid #E5E7EB}
+.si{display:flex;align-items:center;gap:.5rem;padding:.45rem .75rem;border-bottom:1px solid #E5E7EB;cursor:pointer;min-height:44px}
+.si:last-child{border-bottom:none}.si.done .sn{text-decoration:line-through;color:#9CA3AF}
+.cb{width:18px;height:18px;min-width:18px;border:1.5px solid #5B8DEE;border-radius:3px;display:flex;align-items:center;justify-content:center}
+.cb svg{width:10px;height:10px;stroke:transparent}
+.si.done .cb{background:#5B8DEE}.si.done .cb svg{stroke:#fff}
+.sn{font-size:.83rem;flex:1;line-height:1.3}
+.bag{font-size:.65rem;font-weight:700;padding:1px 6px;border-radius:99px;white-space:nowrap}
+.bf{background:#DBEAFE;color:#1E3A8A}.bj{background:#FCE7F3;color:#831843}
+/* PERSON HEAD */
+.ph{display:flex;align-items:center;gap:.625rem;padding:.6rem .75rem;background:#fff;border:1px solid #E5E7EB;border-radius:8px;margin-bottom:.75rem}
+.av{width:35px;height:35px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0}
+.avm{background:#DBEAFE;color:#1E3A8A}.avf{background:#FCE7F3;color:#831843}
+.pn{font-weight:700;font-size:.88rem}.pb2{font-size:.68rem;color:#6B7280}
+.pw{font-size:.9rem;font-weight:700;color:var(--sky);margin-left:auto}
+/* SECTIONS */
+.sec{border-radius:8px;border:1px solid;margin-bottom:.55rem;overflow:hidden;background:#fff}
+.sec-h{display:flex;align-items:center;gap:.35rem;padding:.45rem .7rem;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;min-height:40px}
+.sec-h svg{width:12px;height:12px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.sw{margin-left:auto;font-weight:400;font-size:.66rem;opacity:.7;letter-spacing:0}
+.sb{padding:.05rem 0}
+.cs{border-color:#5DBDB0}.cs .sec-h{background:#E6F4F1;color:#1A4D47}
+.cc{border-color:#8B74E8}.cc .sec-h{background:#EDE9FB;color:#2D1F6B}
+.ck{border-color:#F5A623}.ck .sec-h{background:#FEF3E2;color:#5A3A00}
+.ch{border-color:#E06FAC}.ch .sec-h{background:#FCE8F1;color:#5B1735}
+.ct{border-color:#5B8DEE}.ct .sec-h{background:#E8F0FE;color:#1A2E70}
+.cn{border-color:#9CA3AF}.cn .sec-h{background:#F0F0EE;color:#2C2C2A}
+.item{display:flex;align-items:flex-start;gap:.45rem;padding:.4rem .7rem;border-bottom:1px solid #E5E7EB;cursor:pointer;min-height:44px}
+.item:last-child{border-bottom:none}
+.icb{width:18px;height:18px;min-width:18px;border:1.5px solid;border-radius:3px;margin-top:1px;display:flex;align-items:center;justify-content:center;background:#fff}
+.icb svg{width:10px;height:10px;stroke:transparent}
+.cs .icb{border-color:#5DBDB0}.cc .icb{border-color:#8B74E8}.ck .icb{border-color:#F5A623}
+.ch .icb{border-color:#E06FAC}.ct .icb{border-color:#5B8DEE}.cn .icb{border-color:#9CA3AF}
+.cs .item.done .icb{background:#5DBDB0}.cc .item.done .icb{background:#8B74E8}
+.ck .item.done .icb{background:#F5A623}.ch .item.done .icb{background:#E06FAC}
+.ct .item.done .icb{background:#5B8DEE}.cn .item.done .icb{background:#9CA3AF}
+.item.done .icb svg{stroke:#fff}.item.done .in{text-decoration:line-through;color:#9CA3AF}
+.it{flex:1}.in{font-size:.83rem;line-height:1.3}.inote{font-size:.67rem;color:#9CA3AF;margin-top:1px}
+.iw{font-size:.68rem;color:#9CA3AF;white-space:nowrap;margin-top:1px}
+.btag{display:inline-block;font-size:.6rem;font-weight:700;padding:0 4px;border-radius:99px;background:#FEF3E2;color:#5A3A00;margin-left:3px}
+/* FOOT */
+.fb{border-radius:8px;padding:.625rem .75rem;font-size:.77rem;line-height:1.5;margin-bottom:.55rem}
+.fg{background:#ECFDF5;color:#065F46;border:1px solid #A7F3D0}
+.fa{background:#FFFBEB;color:#78350F;border:1px solid #FDE68A}
+.fb b{display:block;font-weight:700;margin-bottom:.15rem}
+.rbtn{display:block;width:100%;background:transparent;border:1px solid #E5E7EB;border-radius:99px;padding:.55rem;font:.83rem system-ui;color:#6B7280;cursor:pointer;text-align:center}
+/* TRASA */
+.cstrip{display:flex;border-radius:7px;overflow:hidden;height:24px;margin-bottom:.75rem}
+.cfr{background:#E8F0FE;flex:3.5;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:#185FA5}
+.cit{background:#FEF3E2;flex:2.5;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:#854F0B}
+.cch{background:#EAF3DE;flex:2;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:#3B6D11}
+.cfr2{background:#E8F0FE;flex:2;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:#185FA5}
+.mc{background:#fff;border:1px solid #E5E7EB;border-radius:8px;padding:.625rem;margin-bottom:.75rem}
+.mc-t{font-size:.72rem;font-weight:700;color:var(--sky);margin-bottom:.4rem}
+.pc2{background:#fff;border:1px solid #E5E7EB;border-radius:8px;padding:.625rem;margin-bottom:.75rem}
+.pc2-t{font-size:.72rem;font-weight:700;color:var(--sky);margin-bottom:.4rem}
+/* STAGE LIST */
+.el{display:flex;flex-direction:column;gap:.45rem}
+.ecard{background:#fff;border:1px solid #E5E7EB;border-radius:8px;overflow:hidden;cursor:pointer}
+.ecard:active{background:#F0F0F0}
+.ec-h{display:flex;align-items:center;gap:.55rem;padding:.55rem .75rem;min-height:50px}
+.ec-n{width:26px;height:26px;min-width:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;background:rgba(0,0,0,.1);flex-shrink:0}
+.ec-r{font-size:.83rem;font-weight:600;line-height:1.2;flex:1}
+.ec-ld{font-size:.65rem;margin-top:1px}
+.ec-arr{color:#9CA3AF;font-size:.85rem;flex-shrink:0}
+.ec-s{display:flex;gap:.75rem;padding:.35rem .75rem .45rem;border-top:1px solid #E5E7EB;background:#F7F8FA}
+.es{font-size:.7rem;color:#6B7280}.es b{color:#111}
+/* DETAIL */
+.det-back{display:flex;align-items:center;gap:.3rem;font-size:.83rem;font-weight:600;color:var(--sky);padding:.4rem 0;cursor:pointer;margin-bottom:.5rem;min-height:44px}
+.det-back svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round}
+.det-hc{border-radius:8px;padding:.875rem;color:#fff;margin-bottom:.625rem}
+.det-hn{font-size:.67rem;opacity:.65;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.18rem}
+.det-ht{font-size:1.0rem;font-weight:700;line-height:1.2}
+.det-hs{font-size:.73rem;opacity:.72;margin-top:.18rem}
+.det-sts{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.625rem}
+.dst{background:rgba(255,255,255,.18);border-radius:5px;padding:.28rem .5rem;min-width:52px;text-align:center}
+.dv{font-size:.9rem;font-weight:700}.dl{font-size:.55rem;opacity:.65;text-transform:uppercase;letter-spacing:.04em}
+.det-map{background:#fff;border:1px solid #E5E7EB;border-radius:8px;padding:.5rem;margin-bottom:.55rem}
+.det-prof{background:#fff;border:1px solid #E5E7EB;border-radius:8px;padding:.5rem;margin-bottom:.55rem}
+.det-desc{font-size:.83rem;line-height:1.65;color:#374151;background:#fff;border:1px solid #E5E7EB;border-radius:8px;padding:.625rem;margin-bottom:.55rem}
+.ic{background:#fff;border:1px solid #E5E7EB;border-radius:8px;overflow:hidden;margin-bottom:.45rem}
+.ic-h{padding:.4rem .75rem;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #E5E7EB}
+.ic-r{display:flex;gap:.35rem;padding:.38rem .75rem;border-bottom:1px solid #E5E7EB;font-size:.82rem;align-items:flex-start}
+.ic-r:last-child{border-bottom:none}.ic-ico{flex-shrink:0;width:18px;text-align:center}
+.tips{background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:.625rem;margin-bottom:.55rem}
+.tips-t{font-size:.68rem;font-weight:700;color:#78350F;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem}
+.tip{font-size:.82rem;color:#78350F;padding:.16rem 0;display:flex;gap:.3rem}
+.tip::before{content:"›";color:#F5A623;font-weight:700;flex-shrink:0}
+.det-nav{display:flex;gap:.5rem;margin-top:.55rem}
+.dnb{flex:1;background:#fff;border:1px solid #E5E7EB;border-radius:99px;padding:.55rem;font:.8rem system-ui;color:var(--sky);cursor:pointer;text-align:center;min-height:44px}
+.dnb:disabled{color:#9CA3AF;cursor:default}
+.gpx-panel{background:#E6F4F1;border:1px solid #5DBDB0;border-radius:8px;padding:.625rem .75rem;margin-bottom:.55rem}
+.gpx-panel-t{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#1A4D47;margin-bottom:.4rem}
+.gpx-links{display:flex;flex-direction:column;gap:.35rem}
+.gpx-a{font-size:.8rem;font-weight:600;color:#1A4D47;text-decoration:none;border:1px solid #5DBDB0;border-radius:99px;padding:.55rem .875rem;background:#fff;text-align:center;min-height:44px;display:flex;align-items:center;justify-content:center}
+.gpx-note{font-size:.7rem;color:#1A4D47;margin-top:.4rem;line-height:1.45;opacity:.8}
+
+.mbs{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6B7280;margin:1.1rem 0 .4rem;padding-bottom:.28rem;border-bottom:1px solid #E5E7EB}
+.mbs:first-child{margin-top:0}
+.mbcg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.4rem}
+.mbc{background:#fff;border:1px solid #E5E7EB;border-radius:8px;padding:.6rem .75rem}
+.mbcl{font-size:.68rem;color:#6B7280;margin-bottom:1px}
+.mbcv{font-size:1rem;font-weight:700;color:#1a1a1a;line-height:1.2}
+.mbcs{font-size:.65rem;color:#9CA3AF;margin-top:1px}
+.mbblu{border-left:2px solid #185FA5;border-radius:0 8px 8px 0}
+.mbgrn{border-left:2px solid #1D9E75;border-radius:0 8px 8px 0}
+.mbamb{border-left:2px solid #BA7517;border-radius:0 8px 8px 0}
+.mbgg{border-left:2px solid #639922;border-radius:0 8px 8px 0}
+.mbtw{background:#fff;border:1px solid #E5E7EB;border-radius:8px;overflow:hidden;margin-bottom:.25rem}
+.mbrt{width:100%;border-collapse:collapse;font-size:.78rem}
+.mbrt td{padding:5px 8px;border-bottom:1px solid #E5E7EB;color:#1a1a1a;line-height:1.35}
+.mbrt tr:last-child td{border-bottom:none}
+.mbrt td:last-child{text-align:right;font-weight:600;white-space:nowrap;font-size:.78rem}
+.mbrm{color:#6B7280 !important}
+.mbtag{display:inline-block;font-size:.6rem;font-weight:600;padding:1px 5px;border-radius:99px;margin-left:3px;vertical-align:middle}
+.mbtb{background:#FAEEDA;color:#633806}
+.mbtg{background:#EAF3DE;color:#27500A}
+.mbtr{background:#FCEBEB;color:#791F1F}
+.mbtot{background:#F7F8FA;border:1px solid #E5E7EB;border-radius:8px;padding:.65rem .875rem;display:flex;align-items:center;justify-content:space-between;margin:.625rem 0}
+.mbttl{font-size:.75rem;color:#6B7280}
+.mbttv{font-size:1.1rem;font-weight:700;color:#1a1a1a}
+.mbnb{background:#F7F8FA;border:1px solid #E5E7EB;border-radius:7px;padding:.45rem .7rem;font-size:.72rem;color:#6B7280;line-height:1.5;margin-top:.35rem}
+.mbnb strong{font-weight:600;color:#1a1a1a}
+.mbcc{background:#fff;border:1px solid #E5E7EB;border-radius:8px;padding:.65rem .75rem;margin-bottom:8px}
+.mbccn{font-size:.68rem;color:#6B7280}
+.mbcca{font-size:1rem;font-weight:700;color:#1a1a1a;margin:1px 0}
+.mbcct{font-size:.68rem;color:#9CA3AF;line-height:1.4}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>Tour du Mont Blanc · Franjo &amp; Jíťa</h1>
+  <p>25. 7. · Les Houches · ~170 km · 9 etap</p>
+  <div class="top-acc"></div>
+</div>
+
+<!-- PACKLIST -->
+<div id="s-pack" class="scr on">
+  <div class="prg"><div class="prg-r"><span>zabaleno</span><span id="pt">0 / 0</span></div><div class="prg-t"><div class="prg-f" id="pf" style="width:0%"></div></div></div>
+  <div class="sh">
+    <div class="sh-t">Sdílené vybavení</div>
+    <div class="si" onclick="tSI(this)"><div class="cb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><span class="sn">Big Agnes — tyčky + kolíky</span><span class="bag bf">Franjo</span></div>
+    <div class="si" onclick="tSI(this)"><div class="cb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><span class="sn">Big Agnes — flysheet + vana</span><span class="bag bj">Jíťa</span></div>
+    <div class="si" onclick="tSI(this)"><div class="cb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><span class="sn">Plynový vařič + kartuše 1.</span><span class="bag bj">Jíťa</span></div>
+    <div class="si" onclick="tSI(this)"><div class="cb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><span class="sn">Plynová kartuše 2. (náhradní)</span><span class="bag bf">Franjo</span></div>
+    <div class="si" onclick="tSI(this)"><div class="cb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><span class="sn">Ešus + 2× spork Ti + vodní filtr</span><span class="bag bj">Jíťa</span></div>
+    <div class="si" onclick="tSI(this)"><div class="cb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><span class="sn">Rychloschnoucí ručníky 2×</span><span class="bag bj">Jíťa</span></div>
+    <div class="si" onclick="tSI(this)"><div class="cb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><span class="sn">Lopatka na výkaly</span><span class="bag bf">Franjo</span></div>
+  </div>
+  <div class="ptog">
+    <button class="pb on" id="ptf" onclick="sPer('f')">Franjo ~11,7 kg</button>
+    <button class="pb" id="ptj" onclick="sPer('j')">Jíťa ~9,0 kg</button>
+  </div>
+  <!-- FRANJO -->
+  <div id="pf">
+    <div class="ph"><div class="av avm">FJ</div><div><div class="pn">Franjo</div><div class="pb2">Deuter 40+5 · Hanwag GTX · Black Diamond</div></div><div class="pw">~11,7 kg</div></div>
+    <div class="sec cs"><div class="sec-h" onclick="tS(this)"><svg viewBox="0 0 24 24"><path d="M2 18h20M7 18V9a5 5 0 0 1 10 0v9"/><path d="M5 18v2M19 18v2"/></svg>Spaní<span class="sw">~1870g</span></div><div class="sb">
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Spacák Millet péřový</div></div><div class="iw">800g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Thermarest NeoAir XLite Regular</div></div><div class="iw">370g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Big Agnes tyčky + kolíky (sdíl.)</div></div><div class="iw">700g</div></div>
+    </div></div>
+    <div class="sec cc"><div class="sec-h" onclick="tS(this)"><svg viewBox="0 0 24 24"><path d="M20 3H4l2 6H2v4h2l2 6h12l2-6h2V9h-4l2-6z"/></svg>Oblečení<span class="sw">~2410g</span></div><div class="sb">
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Péřová bunda Arc'teryx</div></div><div class="iw">400g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Větruodolná bunda Direct Alpine</div></div><div class="iw">350g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Trekové kalhoty DA<span class="btag">koupit</span></div></div><div class="iw">350g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Kraťasy Mammut</div></div><div class="iw">150g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Trika merino 3×, triko spaní</div></div><div class="iw">450g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Spodní prádlo 3× + ponožky 4×</div></div><div class="iw">280g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Pončo<span class="btag">koupit</span></div></div><div class="iw">250g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Čepice + rukavice + klobouk</div></div><div class="iw">180g</div></div>
+    </div></div>
+    <div class="sec ch"><div class="sec-h" onclick="tS(this)"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Hygiena &amp; zdraví<span class="sw">~560g</span></div><div class="sb">
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Kartáček + zubní pasta</div></div><div class="iw">80g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Mýdlo / gel + krém SPF 50+</div></div><div class="iw">160g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Survival kit Hudy (léky)<span class="btag">koupit</span></div></div><div class="iw">200g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Náplasti + ubrousky</div></div><div class="iw">120g</div></div>
+    </div></div>
+    <div class="sec ct"><div class="sec-h" onclick="tS(this)"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="17" r="1"/></svg>Technika<span class="sw">~1020g</span></div><div class="sb">
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">iPhone + Garmin Epix 2</div></div><div class="iw">312g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Powerbanka 10 Ah</div></div><div class="iw">220g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Kabely 2×, čelovka, brýle, čočky</div></div><div class="iw">300g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Zápisník Midori + pero</div></div><div class="iw">120g</div></div>
+    </div></div>
+    <div class="sec cn"><div class="sec-h" onclick="tS(this)"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Nástroje<span class="sw">~440g</span></div><div class="sb">
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Nůž Victorinox + zapalovač</div></div><div class="iw">160g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Plynová kartuše náhradní (sdíl.)</div></div><div class="iw">270g</div></div>
+    </div></div>
+  </div>
+  <!-- JÍŤA -->
+  <div id="pj" style="display:none">
+    <div class="ph"><div class="av avf">JÍ</div><div><div class="pn">Jíťa</div><div class="pb2">Osprey 30 · Altra GTX · Leki Sherpa</div></div><div class="pw">~9,0 kg</div></div>
+    <div class="sec cs"><div class="sec-h" onclick="tS(this)"><svg viewBox="0 0 24 24"><path d="M2 18h20M7 18V9a5 5 0 0 1 10 0v9"/><path d="M5 18v2M19 18v2"/></svg>Spaní<span class="sw">~1870g</span></div><div class="sb">
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Spacák Millet péřový</div></div><div class="iw">800g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Thermarest NeoAir XLite<span class="btag">koupit</span></div></div><div class="iw">370g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Big Agnes flysheet + vana (sdíl.)</div></div><div class="iw">700g</div></div>
+    </div></div>
+    <div class="sec cc"><div class="sec-h" onclick="tS(this)"><svg viewBox="0 0 24 24"><path d="M20 3H4l2 6H2v4h2l2 6h12l2-6h2V9h-4l2-6z"/></svg>Oblečení<span class="sw">~2360g</span></div><div class="sb">
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Péřová bunda La Sportiva</div></div><div class="iw">350g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Větruodolná bunda Direct Alpine</div></div><div class="iw">320g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Trekové kalhoty DA<span class="btag">koupit</span></div></div><div class="iw">300g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Lehké legíny na spaní</div></div><div class="iw">120g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Kraťasy Alpine Pro</div></div><div class="iw">130g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Trika merino 3×, triko spaní</div></div><div class="iw">400g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Spodní prádlo 3× + ponožky 4×</div></div><div class="iw">250g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Pončo<span class="btag">koupit</span></div></div><div class="iw">230g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Čepice + rukavice + klobouk</div></div><div class="iw">160g</div></div>
+    </div></div>
+    <div class="sec ck"><div class="sec-h" onclick="tS(this)"><svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>Vaření<span class="sw">~520g</span></div><div class="sb">
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Vařič + kartuše (sdíl.)</div></div><div class="iw">370g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Skládací lahev + ubrousky</div></div><div class="iw">150g</div></div>
+    </div></div>
+    <div class="sec ch"><div class="sec-h" onclick="tS(this)"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Kosmetika &amp; zdraví<span class="sw">~580g</span></div><div class="sb">
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Kartáček + zubní pasta</div></div><div class="iw">80g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Šampon, gel, deodorant, krém</div></div><div class="iw">200g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Krém na rty SPF + hygien. potřeby</div></div><div class="iw">125g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Survival kit Hudy<span class="btag">koupit</span></div></div><div class="iw">200g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Náplasti + vlhčené ubrousky</div></div><div class="iw">110g</div></div>
+    </div></div>
+    <div class="sec ct"><div class="sec-h" onclick="tS(this)"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="17" r="1"/></svg>Technika<span class="sw">~360g</span></div><div class="sb">
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">iPhone + Apple Watch Ultra 2</div></div><div class="iw">291g</div></div>
+      <div class="item" onclick="tI(this)"><div class="icb"><svg viewBox="0 0 10 10" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div><div class="it"><div class="in">Kabel + čelovka + sluneční brýle</div></div><div class="iw">170g</div></div>
+    </div></div>
+  </div>
+  <div class="fb fg"><b>Na nohou &amp; v rukou</b>Franjo: Hanwag GTX · Black Diamond<br>Jíťa: Altra GTX · Leki Sherpa</div>
+  <div class="fb fa"><b>Ještě koupit</b>Kalhoty DA — oba · Pončo — oba · NeoAir — Jíťa · Survival kit — oba</div>
+  <button class="rbtn" onclick="resetAll()">Resetovat odškrtnutí</button>
+</div>
+
+<!-- TRASA -->
+<div id="s-trasa" class="scr">
+  <div class="cstrip"><div class="cfr">🇫🇷 FR 1–2</div><div class="cit">🇮🇹 IT 3–4</div><div class="cch">🇨🇭 CH 5–6</div><div class="cfr2">🇫🇷 FR 7–9</div></div>
+  <div class="mc">
+    <div class="mc-t">Klepněte na číslo etapy</div>
+    <svg id="mobmap" viewBox="0 0 340 200" style="width:100%;display:block;border-radius:6px">
+      <rect width="340" height="200" fill="#d8eaf4" rx="5"/>
+      <ellipse cx="170" cy="100" rx="90" ry="68" fill="#c8dae6" opacity=".5"/>
+      <text x="170" y="97" text-anchor="middle" font-size="9.5" fill="#4a7a8a" font-weight="700" font-family="system-ui">MONT BLANC</text>
+      <text x="170" y="109" text-anchor="middle" font-size="7.5" fill="#6a8a98" font-family="system-ui">4808 m</text>
+      <polyline points="46,105 63,152 97,176 185,161 251,128 264,69 228,47 172,40 138,55 46,105" fill="none" stroke="#1B3A5C" stroke-width="2" stroke-dasharray="5,3" opacity=".75"/>
+      <g id="mob-stops"></g>
+    </svg>
+  </div>
+  <div class="pc2">
+    <div class="pc2-t">Výškový profil</div>
+    <svg id="mobprof" viewBox="0 0 310 72" style="width:100%;display:block"></svg>
+  </div>
+  <div class="el" id="elist"></div>
+</div>
+
+<!-- DETAIL -->
+<div id="s-det" class="scr">
+  <div class="det-back" onclick="goBack()">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    zpět na etapy
+  </div>
+  <div id="det-content"></div>
+</div>
+
+<nav class="bot">
+  <button class="bn on" id="bn-pack" onclick="go('pack')">
+    <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+    Packlist
+  </button>
+  <button class="bn" id="bn-trasa" onclick="go('trasa')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="2 12 22 12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+    Trasa
+  </button>
+  <button class="bn" id="bn-budget" onclick="go('budget')">
+    <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/><line x1="14" y1="15" x2="16" y2="15"/></svg>
+    Rozpočet
+  </button>
+</nav>
+
+<script>
+const E=[
+ {n:1,from:"Les Houches",to:"Les Contamines",km:20.4,up:1485,dn:1295,land:"FR",col:"Col de Voza 1653m",fA:1007,tA:1164,pA:1653,mx:46,my:105,
+  desc:"Zahájení u ikonické brány TMB. Výstup přes Col de Voza (1653m) — zastávka Tramway du Mont Blanc. Snadná úvodní etapa s výhledy na Mont Blanc.",
+  prof:[1007,1653,1164],plab:["Les Houches","Col de Voza","Les Contamines"],
+  water:["🚰 Fontány v Les Houches a Les Contamines","💧 Potoky při stoupání (filtr doporučen)","🏔 Bufet u Col de Voza — voda"],
+  food:["🛒 Les Contamines — 3 supermarkety!","🥐 Pekárna v Les Contamines","🍕 Kemp le Pontet — pizzerie 5 €"],
+  sleep:["⛺ Camping le Pontet — sprchy, wifi","🏠 Refugio Les Contamines ~45 €","🌿 Aire de bivouac — zdarma, WC"],
+  tips:["Nakupte zásoby na et. 2–3 v Les Contamines!","Bankomat — poslední FR před Itálií"],
+  wpts:[[45.889,6.797,1007,"Les Houches (S)"],[45.865,6.760,1653,"Col de Voza"],[45.827,6.728,1164,"Les Contamines (C)"]]},
+ {n:2,from:"Les Contamines",to:"Les Chapieux",km:17.1,up:1308,dn:925,land:"FR",col:"Col du Bonhomme 2329m",fA:1164,tA:1549,pA:2329,mx:63,my:152,
+  desc:"Náročnější etapa — výstup do Col du Bonhomme 2329m. Strmý sestup do Les Chapieux. Krásné výhledy na ledovce Mont Blancu.",
+  prof:[1164,1460,2329,2479,1549],plab:["Les Cont.","Nant Borrant","Col BH","Col Croix","Les Chap."],
+  water:["🚰 Refugio Nant Borrant — pitná voda","🚰 Refugio Col du Bonhomme","💧 Potok před Les Chapieux"],
+  food:["🏔 Nant Borrant — polévky, sendviče","🧀 Les Chapieux — sýr, salám, bageta","🍽 Refugio La Nova — večeře"],
+  sleep:["🌿 Bivak Les Chapieux — ZDARMA, WC","🏠 Refugio La Nova ~45 €"],
+  tips:["Bivak v Les Chapieux je bezplatný!","Sprcha v La Nova za 5 € i bez nocleje"],
+  wpts:[[45.827,6.728,1164,"Les Contamines (S)"],[45.780,6.740,2329,"Col du Bonhomme"],[45.724,6.757,1549,"Les Chapieux (C)"]]},
+ {n:3,from:"Les Chapieux",to:"Courmayeur",km:27.6,up:1477,dn:1503,land:"IT",col:"Col de la Seigne 2516m",fA:1549,tA:1224,pA:2516,mx:97,my:176,
+  desc:"Nejdelší etapa — překročení hranice do Itálie přes Col de la Seigne 2516m. Refugio Elisabetta — ravioli s máslem! Courmayeur — ideální reset.",
+  prof:[1549,1800,2516,2000,1224],plab:["Chapieux","—","Seigne","Elisabetta","Courmayeur"],
+  water:["🚰 Refugio Elisabetta — pitná voda","💧 Potoky v Val Veny","🚰 Courmayeur — fontány"],
+  food:["🏔 Elisabetta — ravioli s máslem! ★","🛒 Courmayeur — supermarket, lékárna","🍕 Pan per Focaccia — nejlepší na trase!"],
+  sleep:["⛺ Hobo Camp Val Veny — 25,50€/2os., fén, wifi","⛺ Camping Grandes Jorasses","🏨 Hotely Courmayeur"],
+  tips:["Courmayeur = reset: zásoby, lékárna, praní","SIESTA: obchody zavřeny 12:30–15:30!","Zásoby doplňte PŘED CH — je dražší"],
+  wpts:[[45.724,6.757,1549,"Les Chapieux (S)"],[45.728,6.812,2516,"Col de la Seigne"],[45.793,6.900,1224,"Courmayeur (C)"]]},
+ {n:4,from:"Val Ferret",to:"La Fouly (CH)",km:17.4,up:1173,dn:596,land:"IT→CH",col:"Grand Col Ferret 2537m ★",fA:1700,tA:1600,pA:2537,mx:185,my:161,
+  desc:"NEJVYŠŠÍ BOD TMB — Grand Col Ferret 2537m. Vstup do Švýcarska. Výhledy na Mont Blanc. Sestup do La Fouly.",
+  prof:[1700,2200,2537,2100,1600],plab:["Val Ferret","Arnuva","GCF 2537m","—","La Fouly"],
+  water:["🚰 Arnuva — pitná voda (poslední před sedlem)","💧 Potoky na CH straně","🚰 La Fouly — fontány"],
+  food:["🏔 Refugio Elena (Arnuva) — jídlo","🛒 La Fouly — zásoby, restaurace","⚠️ Nic mezi Arnuvou a La Fouly!"],
+  sleep:["⛺ Kemp La Fouly — sprchy","🌿 Wild camp jen nad 2500m (CH)"],
+  tips:["Nejvyšší bod TMB — větrovky nutné!","Autobus La Fouly → Champex: ~2 CHF, 17 min"],
+  wpts:[[45.793,6.900,1700,"Val Ferret IT (S)"],[45.861,7.062,2537,"Grand Col Ferret"],[45.868,7.083,1600,"La Fouly CH (C)"]]},
+ {n:5,from:"La Fouly",to:"Champex-Lac",km:15.0,up:600,dn:830,land:"CH",col:"—",fA:1600,tA:1472,pA:null,mx:251,my:128,
+  desc:"Nejsnazší etapa — procházka lesem k idylickému jezeru Champex-Lac. Ideální odpočinkový den, koupání, regenerace.",
+  prof:[1600,1400,1350,1600,1472],plab:["La Fouly","Issert","lesy","—","Champex"],
+  water:["🚰 Průběžně — vesnice Issert, Praz de Fort","🏞 Jezero Champex","🚰 Kemp — voda zdarma"],
+  food:["🛒 Champex — supermarket, pekárna","🍽 Restaurace u jezera","🧀 Lokální sýry"],
+  sleep:["⛺ Camping Rocailles — 15 CHF/stan","🏠 Relais d'Arpette — 15 CHF/os."],
+  tips:["Nejkrásnější odpočinkové místo — nespěchejte!","Zásoby na et. 6–7 doplňte tady"],
+  wpts:[[45.868,7.083,1600,"La Fouly (S)"],[45.910,7.090,1400,"Issert"],[46.029,7.110,1472,"Champex-Lac (C)"]]},
+ {n:6,from:"Champex-Lac",to:"Trient",km:17.5,up:900,dn:950,land:"CH",col:"Alp Bovine 2040m",fA:1472,tA:1279,pA:2040,mx:264,my:69,
+  desc:"Varianta přes Alp Bovine — výhledy. Alternativa Fenêtre d'Arpette (2665m) — nejnáročnější část TMB. Sestup do Trientu.",
+  prof:[1472,1700,2040,1600,1279],plab:["Champex","—","Alp Bovine","—","Trient"],
+  water:["💧 Potoky při výstupu","🚰 Refugio Col de la Forclaz","🚰 Trient — fontány"],
+  food:["🏔 Alp Bovine — horský bufet, sýry","🏔 Refugio Col de la Forclaz","🏠 Refuge du Mont Blanc Trient"],
+  sleep:["⛺ Kemp u Col de la Forclaz","🌿 Bivak v Trientu — WC, voda","🏠 Refuge du Mont Blanc"],
+  tips:["Fenêtre d'Arpette: jen za dobrého počasí!","Zásoby v Champex — v Trientu min. obchodů"],
+  wpts:[[46.029,7.110,1472,"Champex-Lac (S)"],[46.030,7.060,2040,"Alp Bovine"],[46.025,7.010,1279,"Trient (C)"]]},
+ {n:7,from:"Trient",to:"Argentière",km:19.5,up:1150,dn:1120,land:"CH→FR",col:"Col de Balme 2191m",fA:1279,tA:1252,pA:2191,mx:228,my:47,
+  desc:"Col de Balme — návrat do Francie a NEJKRÁSNĚJŠÍ VÝHLED celé trasy. Panorama celého údolí Chamonix. Sestup do Argentière.",
+  prof:[1279,1600,2191,1800,1252],plab:["Trient","—","Col Balme","—","Argentière"],
+  water:["💧 Potoky při výstupu","🚰 Refugio Col de Balme","🚰 Argentière — plná infrastruktura"],
+  food:["🏔 Refugio Col de Balme — nápoje","🛒 Argentière — supermarket","🍽 Fondue a raclette!"],
+  sleep:["⛺ Kempy v Argentière","🌿 Aire de bivouac","🏠 B&B v Argentière"],
+  tips:["Col de Balme = NEJKRÁSNĚJŠÍ výhled — nepospíchejte!","Argentière: bankomat, lékárna, zásoby"],
+  wpts:[[46.025,7.010,1279,"Trient (S)"],[46.033,6.973,2191,"Col de Balme"],[45.977,6.921,1252,"Argentière (C)"]]},
+ {n:8,from:"Argentière",to:"Chamonix",km:14.0,up:880,dn:1050,land:"FR",col:"Grand Balcon Sud",fA:1252,tA:1025,pA:1877,mx:172,my:40,
+  desc:"Grand Balcon Sud — nepřetržitý výhled na Mont Blanc a ledovce. Žebříky u La Flégère. Sestup do Chamonix.",
+  prof:[1252,1877,1877,1600,1025],plab:["Argentière","Balcon","La Flégère","—","Chamonix"],
+  water:["🚰 Chaty na Grand Balcon Sud","🚰 Chamonix — vše"],
+  food:["🏔 Chata La Flégère","🛒 Chamonix — vše","🍕 Slavnostní večeře!"],
+  sleep:["⛺ Kempy u Chamonix — pračka, sušička","🏨 Hotely v Chamonix"],
+  tips:["ŽEBŘÍKY — pozor s těžkým batohem!","Lanovka La Flégère → Chamonix (rychlejší)"],
+  wpts:[[45.977,6.921,1252,"Argentière (S)"],[45.960,6.870,1877,"La Flégère"],[45.924,6.869,1025,"Chamonix (C)"]]},
+ {n:9,from:"Chamonix",to:"Les Houches 🏁",km:9.0,up:650,dn:680,land:"FR",col:"Le Brévent 2525m",fA:1025,tA:1007,pA:2525,mx:138,my:55,
+  desc:"FINÁLOVÁ ETAPA — nejkratší den. Výstup přes Le Brévent 2525m. CÍL u startovní brány TMB. Okruh uzavřen!",
+  prof:[1025,1800,2525,1800,1007],plab:["Chamonix","—","Le Brévent","—","🏁 LH"],
+  water:["🚰 Doplňte v Chamonix","🚰 Les Houches — cíl!"],
+  food:["🏔 Refugio Le Brévent — poslední jídlo","🍾 OSLAVA v Les Houches!","🚗 Škoda Superb čeká!"],
+  sleep:["⛺ Camping Les Drus u parkoviště","🏨 Hotely v Les Houches"],
+  tips:["Sestup z Le Brévent — hůlky, pomalu","FOTKA u startovní brány — nezapomenutelné!"],
+  wpts:[[45.924,6.869,1025,"Chamonix (S)"],[45.940,6.830,2525,"Le Brévent"],[45.889,6.797,1007,"Les Houches 🏁 (C)"]]}
+];
+const CC={FR:"#E8F0FE",IT:"#FEF3E2","IT→CH":"#FEF9EE",CH:"#EAF3DE","CH→FR":"#EAF7EE"};
+const CT={FR:"#185FA5",IT:"#854F0B","IT→CH":"#3B6D11",CH:"#3B6D11","CH→FR":"#185FA5"};
+const CB={FR:"#1B3A5C",IT:"#5A3A00","IT→CH":"#2A5A20",CH:"#1A4D20","CH→FR":"#1B3A5C"};
+
+let prev='trasa', traBuilt=false;
+
+// ===== NAVIGATION — single source of truth =====
+function go(id){
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.bn').forEach(b=>b.classList.remove('on'));
+  const scr=document.getElementById('s-'+id);
+  if(!scr){console.warn('screen not found: s-'+id);return;}
+  scr.classList.add('on');
+  const bn=document.getElementById('bn-'+id);
+  if(bn) bn.classList.add('on');
+  window.scrollTo(0,0);
+  if(id==='trasa'&&!traBuilt){traBuilt=true;buildTrasa();}
+  if(id!=='det') prev=id;
+}
+function goBack(){go(prev);}
+
+// ===== PERSON TOGGLE =====
+function sPer(p){
+  document.getElementById('pf').style.display=p==='f'?'':'none';
+  document.getElementById('pj').style.display=p==='j'?'':'none';
+  document.getElementById('ptf').classList.toggle('on',p==='f');
+  document.getElementById('ptj').classList.toggle('on',p==='j');
+}
+
+// ===== PACK =====
+function tI(el){el.classList.toggle('done');upP();}
+function tSI(el){el.classList.toggle('done');upP();}
+function tS(h){const b=h.nextElementSibling;b.style.display=b.style.display==='none'?'':'none';}
+function upP(){
+  const a=document.querySelectorAll('.item,.si').length;
+  const d=document.querySelectorAll('.item.done,.si.done').length;
+  document.getElementById('pf').style.width=(a?Math.round(d/a*100):0)+'%';
+  document.getElementById('pt').textContent=d+' / '+a;
+}
+function resetAll(){document.querySelectorAll('.item.done,.si.done').forEach(e=>e.classList.remove('done'));upP();}
+upP();
+
+// ===== BUILD TRASA =====
+function buildTrasa(){
+  // map stops
+  const ns='http://www.w3.org/2000/svg';
+  const g=document.getElementById('mob-stops');
+  E.forEach(e=>{
+    const gr=document.createElementNS(ns,'g');
+    gr.style.cursor='pointer';
+    gr.addEventListener('click',()=>openDet(e.n));
+    const c=document.createElementNS(ns,'circle');
+    c.setAttribute('cx',e.mx);c.setAttribute('cy',e.my);c.setAttribute('r','12');
+    c.setAttribute('fill','#E06FAC');c.setAttribute('stroke','white');c.setAttribute('stroke-width','1.5');
+    const t=document.createElementNS(ns,'text');
+    t.setAttribute('x',e.mx);t.setAttribute('y',e.my+4);
+    t.setAttribute('text-anchor','middle');t.setAttribute('font-size','9');
+    t.setAttribute('fill','white');t.setAttribute('font-weight','700');t.setAttribute('font-family','system-ui');
+    t.textContent=e.n;
+    gr.appendChild(c);gr.appendChild(t);g.appendChild(gr);
+  });
+  // profile
+  const alts=[1007,1653,1164,2329,1549,2516,1224,2537,1600,1472,2040,1279,2191,1252,2525,1007];
+  const W=310,H=58,PX=16,PY=6;
+  const n=alts.length;
+  const xs=alts.map((_,i)=>PX+i*(W-2*PX)/(n-1));
+  const ys=alts.map(a=>H-PY-(a-1000)/(2700-1000)*(H-2*PY));
+  const dc=alts.map((_,i)=>{if(i===0||i===n-1)return'#E06FAC';if([3,5,7,10,12,14].includes(i))return'#F5A623';return'#5DBDB0';});
+  let poly=`${xs[0]},${H} `+xs.map((x,i)=>x+','+ys[i]).join(' ')+` ${xs[n-1]},${H}`;
+  const pts=xs.map((x,i)=>x+','+ys[i]).join(' ');
+  let svg=`<defs><linearGradient id="mg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1B3A5C" stop-opacity=".12"/><stop offset="100%" stop-color="#1B3A5C" stop-opacity="0"/></linearGradient></defs>`;
+  svg+=`<polygon points="${poly}" fill="url(#mg)"/>`;
+  svg+=`<polyline points="${pts}" fill="none" stroke="#1B3A5C" stroke-width="1.5" stroke-linejoin="round"/>`;
+  xs.forEach((x,i)=>{svg+=`<circle cx="${x}" cy="${ys[i]}" r="2.5" fill="${dc[i]}" stroke="white" stroke-width=".8"/>`;});
+  document.getElementById('mobprof').innerHTML=svg;
+  // stage list
+  const g2=document.getElementById('elist');
+  E.forEach(e=>{
+    const bg=CC[e.land]||'#F7F8FA',tx=CT[e.land]||'#111';
+    const d=document.createElement('div');
+    d.className='ecard';d.onclick=()=>openDet(e.n);
+    d.innerHTML=`<div class="ec-h" style="background:${bg}">
+      <div class="ec-n" style="color:${tx}">${e.n}</div>
+      <div style="flex:1"><div class="ec-r" style="color:${tx}">${e.from} → ${e.to}</div>
+      <div class="ec-ld" style="color:${tx}">${e.land} · ${e.col}</div></div>
+      <span class="ec-arr">›</span>
+    </div>
+    <div class="ec-s"><div class="es"><b>${e.km}km</b></div><div class="es">↑<b>${e.up}m</b></div><div class="es">↓<b>${e.dn}m</b></div></div>`;
+    g2.appendChild(d);
+  });
+}
+
+// ===== DETAIL =====
+function openDet(n){
+  const e=E[n-1];
+  const hbg=CB[e.land]||'#1B3A5C';
+  const rows=arr=>arr.map(r=>`<div class="ic-r"><div class="ic-ico">${r.split(' ')[0]}</div><div>${r.slice(r.indexOf(' ')+1)}</div></div>`).join('');
+  // build stage map SVG
+  const mapSvg=buildStagemap(e);
+  // profile SVG
+  const profSvg=buildStagoprof(e);
+
+  document.getElementById('det-content').innerHTML=`
+    <div class="det-hc" style="background:${hbg}">
+      <div class="det-hn">Etapa ${e.n} · ${e.land}</div>
+      <div class="det-ht">${e.from} → ${e.to}</div>
+      <div class="det-hs">${e.col}</div>
+      <div class="det-sts">
+        <div class="dst"><div class="dv">${e.km}km</div><div class="dl">vzdál.</div></div>
+        <div class="dst"><div class="dv">↑${e.up}m</div><div class="dl">výstup</div></div>
+        <div class="dst"><div class="dv">↓${e.dn}m</div><div class="dl">sestup</div></div>
+        <div class="dst"><div class="dv">${e.pA?e.pA+'m':'—'}</div><div class="dl">vrchol</div></div>
+      </div>
+    </div>
+    <div class="det-map">${mapSvg}</div>
+    <div class="det-prof">${profSvg}</div>
+    <div class="det-desc">${e.desc}</div>
+    <div class="ic"><div class="ic-h" style="background:#E6F4F1;color:#1A4D47">🚰 Voda</div>${rows(e.water)}</div>
+    <div class="ic"><div class="ic-h" style="background:#FEF3E2;color:#5A3A00">🍕 Jídlo &amp; zásoby</div>${rows(e.food)}</div>
+    <div class="ic"><div class="ic-h" style="background:#EDE9FB;color:#2D1F6B">⛺ Nocleh</div>${rows(e.sleep)}</div>
+    <div class="tips"><div class="tips-t">💡 Tipy</div>${e.tips.map(t=>`<div class="tip">${t}</div>`).join('')}</div>
+    <div class="gpx-panel">
+      <div class="gpx-panel-t">⬇ GPX etapa ${e.n} — stáhnout</div>
+      <div class="gpx-links">
+        <a class="gpx-a" href="https://tour-du-mont-itinerary-planner.openair.tools/" target="_blank">openair.tools — GPX zdarma ↗</a>
+        <a class="gpx-a" href="https://tmbmap.com/" target="_blank">tmbmap.com — GPX zdarma ↗</a>
+        <a class="gpx-a" href="https://hiking.waymarkedtrails.org/#route?id=124456" target="_blank">Waymarked Trails ↗</a>
+      </div>
+      <div class="gpx-note">Na výše uvedených webech stáhněte GPX pro etapu ${e.n} a importujte do Garmin, Mapy.cz nebo Apple Watch.</div>
+    </div>
+    <div class="det-nav">
+      <button class="dnb" ${n<=1?'disabled':''} onclick="openDet(${n-1})">← et. ${n-1}</button>
+      <button class="dnb" ${n>=9?'disabled':''} onclick="openDet(${n+1})">et. ${n+1} →</button>
+    </div>`;
+  // switch to detail screen without affecting prev
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.bn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('s-det').classList.add('on');
+  window.scrollTo(0,0);
+}
+
+function buildStagemap(e){
+  const W=290,H=140,P=20;
+  const lats=e.wpts.map(w=>w[0]),lons=e.wpts.map(w=>w[1]);
+  const mnLat=Math.min(...lats),mxLat=Math.max(...lats);
+  const mnLon=Math.min(...lons),mxLon=Math.max(...lons);
+  const tx=lon=>P+(lon-mnLon)/(mxLon-mnLon||.001)*(W-2*P);
+  const ty=lat=>H-P-(lat-mnLat)/(mxLat-mnLat||.001)*(H-2*P);
+  const pts=e.wpts.map(w=>`${tx(w[1])},${ty(w[0])}`).join(' ');
+  let marks='',labs='';
+  e.wpts.forEach((w,i)=>{
+    const x=tx(w[1]),y=ty(w[0]);
+    const fill=i===0?'#E06FAC':i===e.wpts.length-1?'#5DBDB0':'#F5A623';
+    marks+=`<circle cx="${x}" cy="${y}" r="6" fill="${fill}" stroke="white" stroke-width="1.5"/>`;
+    if(i===0||i===e.wpts.length-1)
+      marks+=`<text x="${x}" y="${y+4}" text-anchor="middle" font-size="7.5" fill="white" font-weight="700" font-family="system-ui">${i===0?'S':'C'}</text>`;
+    const lx=x+(x>W/2?-4:4),la=x>W/2?'end':'start';
+    labs+=`<text x="${lx}" y="${y-8}" text-anchor="${la}" font-size="8" fill="#1B3A5C" font-family="system-ui">${w[3]}</text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block;border-radius:5px">
+    <rect width="${W}" height="${H}" fill="#d8eaf4"/>
+    <polyline points="${pts}" fill="none" stroke="#1B3A5C" stroke-width="2.5" stroke-linejoin="round"/>
+    ${marks}${labs}
+  </svg>`;
+}
+
+function buildStagoprof(e){
+  const alts=e.prof,lbls=e.plab;
+  const W=290,H=70,P=10;
+  const n=alts.length;
+  const xs=alts.map((_,i)=>P+i*(W-2*P)/(n-1));
+  const mn=Math.min(...alts)-60,mx=Math.max(...alts)+50;
+  const ys=alts.map(a=>H-P-(a-mn)/(mx-mn)*(H-2*P));
+  const dc=alts.map((a,i)=>{if(i===0||i===n-1)return'#E06FAC';return a===Math.max(...alts)?'#F5A623':'#5DBDB0';});
+  let poly=`${xs[0]},${H} `+xs.map((x,i)=>x+','+ys[i]).join(' ')+` ${xs[n-1]},${H}`;
+  const pts=xs.map((x,i)=>x+','+ys[i]).join(' ');
+  let svg=`<svg viewBox="0 0 ${W} ${H+14}" style="width:100%;display:block">
+    <defs><linearGradient id="dpg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1B3A5C" stop-opacity=".11"/><stop offset="100%" stop-color="#1B3A5C" stop-opacity="0"/></linearGradient></defs>
+    <polygon points="${poly}" fill="url(#dpg)"/>
+    <polyline points="${pts}" fill="none" stroke="#1B3A5C" stroke-width="1.8" stroke-linejoin="round"/>`;
+  xs.forEach((x,i)=>{
+    svg+=`<circle cx="${x}" cy="${ys[i]}" r="3.5" fill="${dc[i]}" stroke="white" stroke-width="1.2"/>`;
+    svg+=`<text x="${x}" y="${H+12}" text-anchor="middle" font-size="7.5" fill="#6B7280" font-family="system-ui">${lbls[i]}</text>`;
+  });
+  return svg+'</svg>';
+}
+
+
+</script>
+
+<!-- BUDGET -->
+<div id="s-budget" class="scr">
+
+
+<div class="mbcg">
+  <div class="mbc mbblu"><div class="mbcl">Celkem oba</div><div class="mbcv">~44 800 Kč</div><div class="mbcs">vybavení + trek</div></div>
+  <div class="mbc mbamb"><div class="mbcl">Na osobu</div><div class="mbcv">~22 400 Kč</div><div class="mbcs">průměr Franjo / Jíťa</div></div>
+  <div class="mbc mbgrn"><div class="mbcl">Trek samotný</div><div class="mbcv">~23 500 Kč</div><div class="mbcs">oba, hlavně bivak</div></div>
+  <div class="mbc mbgg"><div class="mbcl">Hotovost</div><div class="mbcv">~350 EUR</div><div class="mbcs">+ 100 CHF na pár</div></div>
+</div>
+
+<div class="mbs">A — Doprava (tam i zpět)</div>
+<div class="mbtw"><table class="mbrt">
+  <tr><td>Nafta ~1 900 km, 6 l/100 km</td><td>~5 800 Kč</td></tr>
+  <tr><td>Švýcarská vigneta (via.admin.ch) <span class="mbtag mbtb">koupit</span></td><td>~1 050 Kč</td></tr>
+  <tr><td>FR mýtné obě cesty</td><td>~700 Kč</td></tr>
+  <tr><td class="mbrm"><strong>Doprava celkem</strong></td><td><strong>~7 550 Kč</strong></td></tr>
+</table></div>
+
+<div class="mbs">B — Nocleh (10 nocí)</div>
+<div class="mbtw"><table class="mbrt">
+  <tr><td>Noc 1 — Les Houches, kemp <span class="mbtag mbtb">nutný</span></td><td>~600 Kč</td></tr>
+  <tr><td>Noc 2 — Les Contamines, bivak FR</td><td>0 Kč</td></tr>
+  <tr><td>Noc 3 — Les Chapieux, bivak FR</td><td>0 Kč</td></tr>
+  <tr><td>Noc 4 — Val Veny IT <span class="mbtag mbtr">po 20:00, za úsvitu sbalit</span></td><td>0 Kč</td></tr>
+  <tr><td>Noc 5 — La Fouly CH <span class="mbtag mbtr">diskrétně výše</span></td><td>~250 Kč</td></tr>
+  <tr><td>Noc 6 — Champex kemp <span class="mbtag mbtb">nutný — CH údolí</span></td><td>~700 Kč</td></tr>
+  <tr><td>Noc 7 — Trient, aire de bivouac</td><td>0 Kč</td></tr>
+  <tr><td>Noc 8 — Argentière, bivak FR</td><td>0 Kč</td></tr>
+  <tr><td>Noc 9 — Chamonix okolí, bivak FR</td><td>0 Kč</td></tr>
+  <tr><td>Noc 10 — Les Houches, kemp <span class="mbtag mbtb">nutný</span></td><td>~350 Kč</td></tr>
+  <tr><td>Sprchy v refugiích (5–6× po 1–2 €)</td><td>~350 Kč</td></tr>
+  <tr><td class="mbrm"><strong>Nocleh celkem</strong></td><td><strong>~2 250 Kč</strong></td></tr>
+</table></div>
+
+<div class="mbs">C — Jídlo a zásoby</div>
+<div class="mbtw"><table class="mbrt">
+  <tr><td>Zásoby z domova (lyofilizáty, tyčinky…)</td><td>~1 500 Kč</td></tr>
+  <tr><td>Nákupy FR (Contamines, Argentière, Chamonix)</td><td>~2 500 Kč</td></tr>
+  <tr><td>Nákupy IT (Courmayeur — focaccia, gelato)</td><td>~1 500 Kč</td></tr>
+  <tr><td>Nákupy CH (La Fouly, Champex — +20 %)</td><td>~1 200 Kč</td></tr>
+  <tr><td>Refugia / chaty ~3× (Elisabetta, Balme…)</td><td>~1 800 Kč</td></tr>
+  <tr><td>Slavnostní večeře Courmayeur + Chamonix</td><td>~2 500 Kč</td></tr>
+  <tr><td class="mbrm"><strong>Jídlo celkem</strong></td><td><strong>~11 000 Kč</strong></td></tr>
+</table></div>
+
+<div class="mbs">D — Různé</div>
+<div class="mbtw"><table class="mbrt">
+  <tr><td>Plyn — 2 kartušemi 230g</td><td>~600 Kč</td></tr>
+  <tr><td>Autobus La Fouly → Champex (~2 CHF/os.)</td><td>~110 Kč</td></tr>
+  <tr><td>Nápoje, kafe, čokoláda po cestě</td><td>~1 000 Kč</td></tr>
+  <tr><td>Nepředvídané (lanovka, léky, taxi…)</td><td>~1 000 Kč</td></tr>
+  <tr><td class="mbrm"><strong>Různé celkem</strong></td><td><strong>~2 710 Kč</strong></td></tr>
+</table></div>
+
+<div class="mbtot">
+  <div class="mbttl">Trek celkem A+B+C+D (oba)</div>
+  <div class="mbttv">~23 510 Kč</div>
+</div>
+
+<div class="mbs">E — Vybavení ke koupi</div>
+<div class="mbtw"><table class="mbrt">
+  <tr><td>Grayl GeoPress 710ml — 1 ks <span class="mbtag mbtg">sdílený</span></td><td>~2 400 Kč</td></tr>
+  <tr><td>Hydro Flask 500ml — 1 ks</td><td>~1 100 Kč</td></tr>
+  <tr><td>Thermarest NeoAir XLite — Jíťa</td><td>~5 000 Kč</td></tr>
+  <tr><td>Kalhoty Direct Alpine — Franjo</td><td>~3 600 Kč</td></tr>
+  <tr><td>Kalhoty Direct Alpine — Jíťa</td><td>~3 300 Kč</td></tr>
+  <tr><td>Pončo — Franjo</td><td>~1 750 Kč</td></tr>
+  <tr><td>Pončo — Jíťa</td><td>~1 750 Kč</td></tr>
+  <tr><td>Lékárnička deuter First Aid Kit Pro <span class="mbtag mbtg">sdílená</span></td><td>~1 350 Kč</td></tr>
+  <tr><td>Švýcarská vigneta (via.admin.ch) <span class="mbtag mbtb">koupit</span></td><td>~1 050 Kč</td></tr>
+  <tr><td class="mbrm"><strong>Vybavení celkem</strong></td><td><strong>~21 300 Kč</strong></td></tr>
+</table></div>
+
+<div class="mbtot">
+  <div class="mbttl">Trek + vybavení celkem (oba)</div>
+  <div class="mbttv">~44 810 Kč</div>
+</div>
+
+<div class="mbs">F — Hotovost a měny</div>
+<div class="mbcc">
+  <div style="font-size:1.1rem;margin-bottom:2px">🇪🇺 Euro</div>
+  <div class="mbccn">Francie a Itálie</div>
+  <div class="mbcca">200–250 EUR</div>
+  <div class="mbcct">Kempy, refugia, sprchy, jídlo. Karty v supermarketech OK. Bankomat: Les Contamines, Courmayeur, Chamonix.</div>
+</div>
+<div class="mbcc">
+  <div style="font-size:1.1rem;margin-bottom:2px">🇨🇭 Švýcarský frank</div>
+  <div class="mbccn">Švýcarsko</div>
+  <div class="mbcca">80–100 CHF</div>
+  <div class="mbcct">Champex kemp + CH nákupy. Platí i EUR, CHF výhodněji. 1 CHF ≈ 28 Kč. Bankomat v La Fouly.</div>
+</div>
+<div class="mbcc">
+  <div style="font-size:1.1rem;margin-bottom:2px">💳 Karta</div>
+  <div class="mbccn">Zbytek výdajů</div>
+  <div class="mbcca">Visa / Mastercard</div>
+  <div class="mbcct">Supermarkety, restaurace. CH = mimo EU — ověřte roaming u operátora před odjezdem!</div>
+</div>
+<div class="mbnb"><strong>Tip:</strong> Drobné 5/10 EUR na sprchy a refugia. CHF měňte v ČR nebo v bankomatu v La Fouly.</div>
+
+</div><!-- /s-budget -->
+
+
+</body>
